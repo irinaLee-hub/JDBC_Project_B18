@@ -22,7 +22,7 @@ public class DB_Connection {
         //  In a nutshell , see it as a full address of your database you can use to make connection
 
 
-        String connectionStr = "jdbc:oracle:thin:@52.71.242.164:1521:XE";
+        String connectionStr = "jdbc:oracle:thin:@100.26.246.143:1521:XE";
         String username = "hr" ;
         String password = "hr" ;
 

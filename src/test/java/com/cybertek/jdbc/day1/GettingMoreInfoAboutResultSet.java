@@ -8,7 +8,7 @@ public class GettingMoreInfoAboutResultSet {
 
     public static void main(String[] args) throws SQLException {
 
-        String connectionStr = "jdbc:oracle:thin:@52.71.242.164:1521:XE";
+        String connectionStr = "jdbc:oracle:thin:@100.26.246.143:1521:XE";
         String username = "hr";
         String password = "hr";
         Connection conn = DriverManager.getConnection(connectionStr, username, password);
@@ -51,6 +51,23 @@ public class GettingMoreInfoAboutResultSet {
         // getting row count
         // we will use rs.last() to move to last row then call rs.getRow() method
                 // -- and that will be the row count of entire ResultSet
+
+
+        //getting the whole table code from class mate
+        rs.last();
+        int  v= rs.getRow();
+// getting column count we need ResultSetMetaData object
+// getting row count
+// we will use rs.last() move to last then call rs.getRow() method
+// and for loop to get all the data
+        rs.first();
+        for (int i = 1; i <=v ; i++) {
+            for (int j = 1; j <=11 ; j++) {
+                System.out.print(rs.getString(j) + "\t");
+            }
+            System.out.println();
+            rs.next();
+        }
 //------ cleaning up -----
         rs.close();
         stmnt.close();
