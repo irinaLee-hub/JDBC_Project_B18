@@ -1,5 +1,7 @@
 package com.cybertek.jdbc.day2;
 
+import com.cybertek.jdbc.utility.DB_Utility;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -33,7 +35,7 @@ public class DB_Practice2 {
       //  System.out.println(DB_Utility.getColumnDataAtRow(3,"Region_name"));
        // System.out.println(DB_Utility.getRowDataAsList1(4));
 
-        System.out.println(DB_Utility.getColumnDataAsList1(4));
+        System.out.println(DB_Utility.getColumnDataAsList(4));
 
      DB_Utility.destroy();
 

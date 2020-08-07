@@ -1,4 +1,6 @@
-package com.cybertek.jdbc.day2;
+package com.cybertek.jdbc.utility;
+
+import com.sun.rowset.internal.Row;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -12,21 +14,82 @@ public class DB_Utility {
     private static Statement statement;
 
     //Create a connection with valid url and username and password
-    public static void createConnection() {
-        String connectionStr = "jdbc:oracle:thin:@100.26.246.143:1521:XE";
-        String username = "hr";
-        String password = "hr";
+   /* public static void createConnection() {
+        String connectionStr = ConfigurationReader.getProperty("database.url");
+        String username = ConfigurationReader.getProperty("database.username");
+        String password = ConfigurationReader.getProperty("database.password");
 
-        try {
-            conn = DriverManager.getConnection(connectionStr, username, password);
-            System.out.println("Connection successful!");
-        } catch (SQLException throwables) {
-            System.out.println("CONNECTION HAS FAILED!");
-            throwables.printStackTrace();
+//            try {
+//            conn = DriverManager.getConnection(connectionStr, username, password);
+//            System.out.println("Connection successful!");
+//        } catch (SQLException throwables) {
+//            System.out.println("CONNECTION HAS FAILED!");
+//            throwables.printStackTrace();
+//        }
+                 createConnection(connectionStr,username,password);
         }
 
 
     }
+
+    */
+    public static void createConnection() {
+
+
+//            try {
+//            conn = DriverManager.getConnection(connectionStr, username, password);
+//            System.out.println("Connection successful!");
+//        } catch (SQLException throwables) {
+//            System.out.println("CONNECTION HAS FAILED!");
+//            throwables.printStackTrace();
+//        }
+
+        if(ConfigurationReader.getProperty("active_env").equalsIgnoreCase("test")){
+            String connectionStr = ConfigurationReader.getProperty("test.database.url");
+            String username = ConfigurationReader.getProperty("test.database.username");
+            String password = ConfigurationReader.getProperty("test.database.password");
+            createConnection(connectionStr,username,password);
+        }else if(ConfigurationReader.getProperty("active_env").equalsIgnoreCase("dev")){
+            String connectionStr = ConfigurationReader.getProperty("dev.database.url");
+            String username = ConfigurationReader.getProperty("dev.database.username");
+            String password = ConfigurationReader.getProperty("dev.database.password");
+            createConnection(connectionStr,username,password);
+        }else{
+            System.out.println("No environment info provided!");
+        }
+
+
+    }
+
+
+    //OVERLOAD createConnection() METHOD TO ACCEPT USERNAME,PASSWORD AND CONNECTIONSTR
+    //url=ConnectionStr
+
+   public static void createConnection(String url,String username,String password){
+
+        try{
+            conn=DriverManager.getConnection(url,username,password);
+        }catch(SQLException e){
+            System.out.println("ERROR WHILE CONNECTING");
+            e.printStackTrace();
+        }
+
+
+    }
+    //OVERLOAD CONNECTION METHOD
+
+    public static void createConnection(String env){
+        //add validation to avoid invalid input
+        //or add some condition to directly get the information
+        String connectionStr = ConfigurationReader.getProperty(env+".database.url");
+        String username = ConfigurationReader.getProperty(env+".database.username");
+        String password = ConfigurationReader.getProperty(env+".database.password");
+        createConnection(connectionStr,username,password);
+        System.out.println("You are in "+env+" environment");
+
+
+    }
+
 
 
     //a method to get the resultSet object with valid connection by executing query
@@ -85,7 +148,6 @@ public class DB_Utility {
             result = rs.getString( columnIndex ) ;
 
 
-
         } catch (SQLException e) {
             System.out.println("ERROR WHILE getColumnDataAtRow ");
             e.printStackTrace();
@@ -102,7 +164,7 @@ public class DB_Utility {
         String result = "" ;
         try {
             rs.absolute( rowNum ) ;
-            result = rs.getString( columnName ) ;
+            result = rs.getString( columnName );
 
         } catch (SQLException e) {
             System.out.println("ERROR WHILE getColumnDataAtRow ");
@@ -114,7 +176,7 @@ public class DB_Utility {
     }
 
     //Getting entire row asList of String of all columns
-    public static List<String>getRowDataAsList1(int rowNum){
+    public static List<String>getRowDataAsList(int rowNum){
         List<String> rowDataList = new ArrayList<>();
 
         // how to move to that Row with rowNum
@@ -139,7 +201,7 @@ public class DB_Utility {
 
     }
 
-    public static int getRowCount1(){
+    public static int getRowCount(){
         int rowCount=0;
 
         try{
@@ -149,13 +211,13 @@ public class DB_Utility {
             rs.beforeFirst();
         }catch(SQLException e){
             e.printStackTrace();
-            System.out.println("ERROR WHILE getRowCount1");
+            System.out.println("ERROR WHILE getRowCount");
         }
         return rowCount;
     }
 
 
-    public static List<String>getColumnDataAsList1(int columnIndex){
+    public static List<String>getColumnDataAsList(int columnIndex){
         List<String>columnDataList= new ArrayList<>();
         try {
             rs.beforeFirst();//moving the cursor to before first location
@@ -168,7 +230,7 @@ public class DB_Utility {
                 rs.beforeFirst();//putting back cursor after we done
             }
         }catch(SQLException e){
-            System.out.println("ERROR WHILE getColumnDataAsList1");
+            System.out.println("ERROR WHILE getColumnDataAsList");
             e.printStackTrace();
         }
 
@@ -177,8 +239,7 @@ public class DB_Utility {
         return columnDataList;
     }
 
-    public static List<String> getColumnDataAsList1(String columnName){
-
+    public static List<String> getColumnDataAsList(String columnName){
 
         List<String> columnDataLst = new ArrayList<>();
         try {
@@ -189,8 +250,6 @@ public class DB_Utility {
                 String data =  rs.getString(columnName) ;
                 // getting the data from that column and adding to the the list
                 columnDataLst.add( data  );
-
-
 
             }
 
@@ -204,64 +263,6 @@ public class DB_Utility {
 
     }
 
-
-
-////////////////////////////////////////////////////////////////////////////////////////////
-
-
-        /**
-         * @return Row number of the resultset
-         */
-        public static int getRowCount() {
-            int rowCount = 0;
-            try {
-                rs.last();
-                rowCount = rs.getRow();
-                rs.beforeFirst();
-            } catch (SQLException e) {
-                System.out.println("ERROR WHILE GETTING ROW COUNT !");
-                e.printStackTrace();
-            }
-            return rowCount;
-        }
-
-        public static List<String> getColumnDataAsList(int columnIndex) {
-            List<String> colDataLst = new ArrayList<>();
-            try {
-                while( rs.next() ) {
-                    colDataLst.add( rs.getString(columnIndex) ) ;
-                }
-            } catch (SQLException e) {
-                System.out.println("ERROR WHILE GETTING THE COLUMN DATA");
-                e.printStackTrace();
-            }
-            return colDataLst;
-        }
-        public static List<String> getColumnDataAsList(String columnName) {
-            List<String> colDataLst = new ArrayList<>();
-            try {
-                while( rs.next() ) {
-                    colDataLst.add( rs.getString(columnName) ) ;
-                }
-            } catch (SQLException e) {
-                System.out.println("ERROR WHILE GETTING THE COLUMN DATA");
-                e.printStackTrace();
-            }
-            return colDataLst;
-        }
-        public static List<String> getRowDataAsList(int rowNum) {
-            List<String> rowDataLst = new ArrayList<>();
-            try {
-                rs.absolute(rowNum);
-                for (int i = 1; i <= getColumnCnt(); i++) {
-                    rowDataLst.add(rs.getString(i));
-                }
-            } catch (SQLException e) {
-                System.out.println("ERROR WHILE getRowDataAsList");
-                e.printStackTrace();
-            }
-            return rowDataLst;
-        }
 
         //GETTING FIRST ROW DATA AS MAP
     //THE KEY IS COLUMN NAME,VALUE IS COLUMN DATA
@@ -279,14 +280,21 @@ public class DB_Utility {
             }
             return rowMap;
         }
-        public static List<Map<String,String> > getAllDataAsListOfMap(){
-            List<Map<String,String> > rowMapList = new ArrayList<>();
-            for (int i = 0; i < getRowCount(); i++) {
-                rowMapList.add(   getRowDataAsMap(i)    ) ;
-            }
-            return rowMapList ;
+
+     /**
+             *
+             * @return The entire resultset as List of Row Map
+ */
+    public static List<Map<String,String> > getAllDataAsListOfMap(){
+        List<Map<String,String> > rowMapList = new ArrayList<>();
+        for (int i = 1; i <= getRowCount(); i++) {
+            rowMapList.add(   getRowDataAsMap(i) ) ;
+
 
         }
+
+        return rowMapList ;
+    }
 
 
         public static List<String> getColumnNameList() {
